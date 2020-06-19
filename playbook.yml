@@ -1,0 +1,36 @@
+---
+- name: Patch Auto Application
+  hosts: all
+  tasks:
+    - name: Call API
+      debug:
+        msg: Call API VA Scan
+#      uri:
+#        url: http://192.168.1.151:9200/
+#        status_code: 200
+#        return_content: yes
+#    - name: Backup OS
+#      shell: rear -d -v mkbackup
+    - name: stop service httpd
+      service:
+        name: httpd
+        state: stopped
+    - include: backupos.yml
+    - name: Prepare Patch
+      debug:
+        msg: copy file patch
+    - name: update CVE
+      shell: yum update --cve CVE-2019-3820 -y
+      register: output
+    - name: Verify CVE
+      debug:
+        msg: "Not Patch"
+      when: "'Resolving Dependencies' in output.stdout"
+    - name: Reboot a slow machine that might have lots of updates to apply
+      reboot:
+        reboot_timeout: 600
+        test_command: whoami
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
