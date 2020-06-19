@@ -9,13 +9,13 @@
 #        url: http://192.168.1.151:9200/
 #        status_code: 200
 #        return_content: yes
-#    - name: Backup OS
-#      shell: rear -d -v mkbackup
-    - name: stop service httpd
+    - name: stop service
       service:
         name: httpd
         state: stopped
-    - include: backupos.yml
+#    - include: backupos.yml
+    - name: Backup OS
+      shell: rear -d -v mkbackup
     - name: Prepare Patch
       debug:
         msg: copy file patch
@@ -30,7 +30,7 @@
       reboot:
         reboot_timeout: 600
         test_command: whoami
-    - name: start httpd
+    - name: start service
       service:
         name: httpd
         state: started
